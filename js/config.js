@@ -1,4 +1,4 @@
-export const TOTAL_TIME = 180; // 3 minutos
+export const TOTAL_TIME = 240; // 4 minutos
 export const STORAGE_KEY = 'mathDefenderHighScores';
 
 export const digitStages = [

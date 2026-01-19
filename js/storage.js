@@ -40,4 +40,9 @@ export class StorageManager {
     }
     return isNew;
   }
+
+  clearAll() {
+    this.best = { ...DEFAULT_BEST };
+    this.save();
+  }
 }
