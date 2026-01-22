@@ -20,6 +20,50 @@ const startScreen = document.getElementById("startScreen");
 const heroStart = document.getElementById("heroStart");
 const modeScreen = document.getElementById("modeScreen");
 const modeCards = document.querySelectorAll(".mode-card");
+
+// Progression: only unlocked modes are playable
+const MODE_ORDER = [
+  "add",
+  "sub",
+  "mul",
+  "div",
+  "sqrt",
+  "pow",
+  "percent",
+  "decimal",
+];
+function loadUnlockedModes() {
+  try {
+    const raw = localStorage.getItem("md_unlockedModes");
+    if (!raw) return ["add"];
+    const arr = JSON.parse(raw);
+    if (!Array.isArray(arr)) return ["add"];
+    return arr.filter((m) => MODE_ORDER.includes(m));
+  } catch (e) {
+    return ["add"];
+  }
+}
+function saveUnlockedModes(arr) {
+  try {
+    localStorage.setItem("md_unlockedModes", JSON.stringify(arr));
+  } catch (e) {}
+}
+let unlockedModes = loadUnlockedModes();
+
+function updateModeLocks() {
+  modeCards.forEach((card) => {
+    const mode = card.dataset.scenario;
+    if (!MODE_ORDER.includes(mode)) return;
+    if (unlockedModes.includes(mode)) {
+      card.classList.remove("locked-mode");
+      card.disabled = false;
+    } else {
+      card.classList.add("locked-mode");
+      card.disabled = true;
+    }
+  });
+}
+updateModeLocks();
 const trainDigitsInput = document.getElementById("trainDigits");
 const trainOperationSelect = document.getElementById("trainOperation");
 const trainStartBtn = document.getElementById("trainStartBtn");
@@ -215,8 +259,8 @@ closeMode.addEventListener("click", closeModeSelection);
 modeCards.forEach((card) => {
   card.addEventListener("click", () => {
     const mode = card.dataset.scenario;
+    if (card.classList.contains("locked-mode")) return;
     if (mode === "train") {
-      // show dedicated train config panel
       if (trainConfigPanel) trainConfigPanel.classList.remove("hidden");
       const grid = modeScreen.querySelector(".mode-grid");
       if (grid) grid.classList.add("hidden");
@@ -364,6 +408,9 @@ if (menuStart)
     const grid = modeScreen.querySelector(".mode-grid");
     if (grid) grid.classList.remove("hidden");
     if (closeMode) closeMode.classList.remove("hidden");
+    // update locks every time menu is opened
+    unlockedModes = loadUnlockedModes();
+    updateModeLocks();
   });
 if (menuScenario)
   menuScenario.addEventListener("click", () => {

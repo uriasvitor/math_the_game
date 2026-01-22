@@ -264,7 +264,40 @@ export class Game {
   }
 
   registerScore() {
-    return this.storage.registerScore(this.state.scenario, this.state.score);
+    const isNew = this.storage.registerScore(
+      this.state.scenario,
+      this.state.score,
+    );
+    // Progression: unlock next mode if user wins (score > 0) in a main mode
+    const progressionModes = [
+      "add",
+      "sub",
+      "mul",
+      "div",
+      "sqrt",
+      "pow",
+      "percent",
+      "decimal",
+    ];
+    const idx = progressionModes.indexOf(this.state.scenario);
+    if (
+      isNew &&
+      this.state.score > 0 &&
+      idx !== -1 &&
+      idx < progressionModes.length - 1
+    ) {
+      try {
+        const raw = localStorage.getItem("md_unlockedModes");
+        let arr = raw ? JSON.parse(raw) : ["add"];
+        if (!Array.isArray(arr)) arr = ["add"];
+        const next = progressionModes[idx + 1];
+        if (!arr.includes(next)) {
+          arr.push(next);
+          localStorage.setItem("md_unlockedModes", JSON.stringify(arr));
+        }
+      } catch (e) {}
+    }
+    return isNew;
   }
 
   spawnHeart() {
