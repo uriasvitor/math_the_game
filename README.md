@@ -82,10 +82,98 @@ python -m http.server 8000
 
 - Fork the repo, make changes and open a PR. Keep diffs focused: separate visual changes from gameplay logic.
 
-**License**
+# Math Defender 🚀🧮
 
-- This repository contains original code; apply a license of your choice or ask me to add a permissive license file (MIT/Apache) if you want.
+Live demo: https://uriasvitor.github.io/math_the_game/
+
+Math Defender is a browser-based typing + math-practice game built with JavaScript and THREE.js. Defend the base by typing answers to arithmetic problems before enemies reach the orbital barrier.
 
 ---
 
-If you want, I can also generate a short DEVELOPMENT.md with commands for local builds/tests, or add a small UI showing the top failures inside the mode screen. Which would you prefer next?
+## 📣 Badges
+
+| Feature      |                                                      Status |
+| ------------ | ----------------------------------------------------------: |
+| GitHub Pages | ✅ [Live demo](https://uriasvitor.github.io/math_the_game/) |
+
+---
+
+## 🌟 Overview (Português)
+
+Math Defender é um jogo de digitação / prática de matemática para navegador. Digite respostas para os problemas que aparecem nos inimigos antes que eles alcancem a barreira da base.
+
+- Modos: Soma, Subtração, Multiplicação, Divisão, Raiz Quadrada, Treino, Sandbox e Recuperação.
+- Mods: Reinício automático, One-Strike, e Reinício automático apenas ao perder.
+- Persistência: recordes e histórico de erros via localStorage.
+
+### ▶️ Como jogar
+
+- Abra o site (link acima) ou rode um servidor local e abra `index.html`.
+- Use a caixa de entrada no painel inferior para digitar respostas; pressione Enter ou clique em "Atirar".
+- `Niveis` abre o seletor de modos; `Mods` abre o painel de modificadores.
+
+### ⚙️ Arquivos importantes
+
+- `index.html` — interface e painéis
+- `main.js` — ligação entre UI e lógica
+- `js/game.js` — loop do jogo, spawn e regras
+- `js/problems.js` — gerador de problemas
+- `js/renderer.js` — renderização (THREE.js)
+- `js/storage.js` — persistência (recordes e falhas)
+
+---
+
+## 🌟 Overview (English)
+
+Math Defender is a browser typing / math-practice game. Type the answers to the math problems displayed on enemies before they reach your base.
+
+- Modes: Addition, Subtraction, Multiplication, Division, Square Root, Training, Sandbox and Recovery.
+- Mods: Auto Restart, One-Strike, Auto Restart on Loss.
+- Persistence: best scores and miss history stored in localStorage.
+
+### ▶️ How to play
+
+- Open the live demo link above or serve the project locally and open `index.html`.
+- Type answers in the terminal input and hit Enter or click `Atirar`.
+- Use `Niveis` to pick a mode and `Mods` to toggle modifiers.
+
+### ⚙️ Important files
+
+- `index.html` — UI and panels
+- `main.js` — UI wiring and session handling
+- `js/game.js` — main gameplay loop and spawn logic
+- `js/problems.js` — problem generator
+- `js/renderer.js` — rendering helpers (THREE.js)
+- `js/storage.js` — persistence and failure tracking
+
+---
+
+## ✅ Recovery mode & persistence details
+
+- Failures are recorded when an enemy reaches the barrier (not during `train` or `sandbox`).
+- Recovery picks problems with repeated misses (default threshold = 10). Successful solves in Recovery decrement that counter.
+- To clear saved data use the "Resetar tudo" button (confirmation modal will show).
+
+---
+
+## 🛠 Development & customization
+
+- Serve locally:
+
+```bash
+python -m http.server 8000
+# open http://localhost:8000
+```
+
+- Change recovery threshold: edit `getTopFailures()` in `js/storage.js`.
+- Add operations in `js/problems.js`.
+
+---
+
+## 📄 License
+
+This repo contains original code. Add a license (MIT/Apache) if you want to publish it.
+
+---
+
+If you want, I can: add a short `DEVELOPMENT.md`, show top failures inside the UI, or provide a translated GitHub Pages description. Which one next?
