@@ -92,15 +92,17 @@ function updateAttemptsDisplay() {
 
 // load mods from localStorage
 const modAutoResetEl = document.getElementById("modAutoReset");
+const modAutoResetOnLossEl = document.getElementById("modAutoResetOnLoss");
 const modOneStrikeEl = document.getElementById("modOneStrike");
 const modsCloseBtn = document.getElementById("modsCloseBtn");
 function loadMods() {
   try {
     const raw = localStorage.getItem("md_mods");
-    if (!raw) return { autoReset: false, oneStrike: false };
+    if (!raw)
+      return { autoReset: false, autoResetOnLoss: false, oneStrike: false };
     return JSON.parse(raw);
   } catch (e) {
-    return { autoReset: false, oneStrike: false };
+    return { autoReset: false, autoResetOnLoss: false, oneStrike: false };
   }
 }
 function saveMods(mods) {
@@ -110,6 +112,8 @@ function saveMods(mods) {
 }
 const initialMods = loadMods();
 if (modAutoResetEl) modAutoResetEl.checked = !!initialMods.autoReset;
+if (modAutoResetOnLossEl)
+  modAutoResetOnLossEl.checked = !!initialMods.autoResetOnLoss;
 if (modOneStrikeEl) modOneStrikeEl.checked = !!initialMods.oneStrike;
 game.setMods && game.setMods(initialMods);
 
@@ -120,6 +124,15 @@ function openModeSelection() {
 
 function closeModeSelection() {
   modeScreen.classList.add("hidden");
+  // ensure we return to the start screen (do not reveal a paused game)
+  if (startScreen) startScreen.classList.remove("hidden");
+  // hide any sub-panels that may be open
+  if (trainConfigPanel) trainConfigPanel.classList.add("hidden");
+  if (sandboxPanel) sandboxPanel.classList.add("hidden");
+  // reset the game so the arena is not left paused in the background
+  try {
+    game.reset();
+  } catch (e) {}
 }
 
 function getTrainingDigits() {
@@ -151,7 +164,8 @@ function pickScenario(mode) {
   }
   game.reset();
   game.start();
-  closeModeSelection();
+  // hide the mode screen without triggering the 'back to start' reset
+  if (modeScreen) modeScreen.classList.add("hidden");
   startScreen.classList.add("hidden");
   answerInput.focus();
 }
@@ -234,6 +248,7 @@ if (modAutoResetEl) {
   modAutoResetEl.addEventListener("change", () => {
     const mods = {
       autoReset: !!modAutoResetEl.checked,
+      autoResetOnLoss: !!modAutoResetOnLossEl?.checked,
       oneStrike: !!modOneStrikeEl.checked,
     };
     saveMods(mods);
@@ -244,6 +259,18 @@ if (modOneStrikeEl) {
   modOneStrikeEl.addEventListener("change", () => {
     const mods = {
       autoReset: !!modAutoResetEl.checked,
+      autoResetOnLoss: !!modAutoResetOnLossEl?.checked,
+      oneStrike: !!modOneStrikeEl.checked,
+    };
+    saveMods(mods);
+    game.setMods && game.setMods(mods);
+  });
+}
+if (modAutoResetOnLossEl) {
+  modAutoResetOnLossEl.addEventListener("change", () => {
+    const mods = {
+      autoReset: !!modAutoResetEl.checked,
+      autoResetOnLoss: !!modAutoResetOnLossEl.checked,
       oneStrike: !!modOneStrikeEl.checked,
     };
     saveMods(mods);
@@ -298,11 +325,17 @@ pauseBtn.addEventListener("click", () => game.pause());
 
 resetBtn.addEventListener("click", () => {
   game.reset();
+  // reset session attempts and update display
+  sessionAttempts = 0;
+  updateAttemptsDisplay();
   openModeSelection();
 });
 
 playAgainBtn.addEventListener("click", () => {
   game.reset();
+  // also reset attempts when explicitly choosing to play again
+  sessionAttempts = 0;
+  updateAttemptsDisplay();
   openModeSelection();
 });
 
