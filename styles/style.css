@@ -137,37 +137,47 @@ button:hover {
 }
 
 main {
-  margin: 16px auto 0;
+  margin: 12px auto 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
   max-width: 1100px;
+  /* limit main height to viewport to avoid page scroll; internal elements will adapt */
+  max-height: calc(100vh - 120px);
 }
 
 .hud {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 10px;
+  position: static;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
 }
 
 .stat {
-  background: rgba(12, 32, 56, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 14px;
-  padding: 12px 14px;
+  background: rgba(8, 20, 36, 0.75);
+  border: 1px solid rgba(78, 240, 200, 0.18);
+  border-radius: 12px;
+  padding: 8px 10px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
 }
 
 .label {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .value {
   font-weight: 700;
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .arena-wrapper {
@@ -177,13 +187,17 @@ main {
   border-radius: 16px;
   padding: 10px;
   box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  /* ensure arena-wrapper fits in available main space */
+  height: 100%;
 }
 
 canvas {
   width: 100%;
-  max-width: 1100px;
-  height: clamp(260px, 50vh, 480px);
-  aspect-ratio: 16 / 9;
+  max-width: none;
   display: block;
   border-radius: 14px;
   background: radial-gradient(80% 80% at 50% 30%, rgba(78, 240, 200, 0.08), rgba(5, 12, 28, 0.9)),
@@ -191,6 +205,10 @@ canvas {
   position: relative;
   z-index: 1;
   image-rendering: pixelated;
+  /* let canvas grow to fill available wrapper space without causing page scroll */
+  flex: 1 1 auto;
+  min-height: 220px;
+  max-height: calc(100vh - 220px);
 }
 
 .label-layer {
@@ -207,6 +225,8 @@ canvas {
   border: 1px solid rgba(78, 240, 200, 0.45);
   border-radius: 10px;
   padding: 6px 10px;
+  top: -12px;
+  left: 8px;
   color: #eaf5f0;
   font-weight: 700;
   font-size: 13px;
@@ -267,7 +287,7 @@ canvas {
   border-radius: 12px;
   padding: 8px 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-  z-index: 2;
+  z-index: 4;
 }
 
 .boss-bar-label {
@@ -346,6 +366,34 @@ canvas {
 .mode-header {
   text-align: center;
   max-width: 620px;
+}
+
+.train-config {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.train-config input {
+  width: 72px;
+  background: #0a120c;
+  border: 1px solid #2f4a37;
+  border-radius: 8px;
+  padding: 6px 8px;
+  color: #8cf596;
+  font-weight: 700;
+  text-align: center;
+  outline: none;
+}
+
+.train-config input:focus {
+  border-color: #8cf596;
+  box-shadow: 0 0 0 2px rgba(140, 245, 150, 0.2);
 }
 
 .mode-grid {
@@ -432,17 +480,20 @@ canvas {
 }
 
 .terminal-panel {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 14px;
   background: linear-gradient(180deg, rgba(26, 39, 31, 0.92), rgba(12, 20, 15, 0.95));
   border: 2px solid #1f3528;
   border-radius: 12px;
   padding: 12px 14px;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(0, 0, 0, 0.4);
-  max-width: 620px;
-  width: 100%;
-  margin: 6px auto 0;
+  width: 50%;
   display: flex;
   gap: 10px;
   align-items: center;
+  z-index: 4;
 }
 
 .terminal-inner {

@@ -45,15 +45,15 @@
       <div class="mode-header">
         <h3>Escolha o nivel</h3>
         <p>
-          Quatro cenarios: comece na soma e avance para subtracao, multiplicacao
-          e divisao.
+          Cenarios principais: comece na soma e avance para subtracao,
+          multiplicacao e divisao. Use o treino para praticar.
         </p>
       </div>
       <div class="mode-grid">
         <button class="mode-card" data-scenario="add">
           <span class="tag easy">Nivel 1</span>
           <h4>Soma</h4>
-          <p>Digitos 1-10 - ritmo baixo</p>
+          <p>Treino: 1, 2 e 3 digitos</p>
         </button>
         <button class="mode-card" data-scenario="sub">
           <span class="tag normal">Nivel 2</span>
@@ -70,6 +70,41 @@
           <h4>Divisao</h4>
           <p>Quocientes inteiros - ritmo variavel</p>
         </button>
+        <button class="mode-card" data-scenario="sqrt">
+          <span class="tag normal">Raiz</span>
+          <h4>Raiz Quadrada</h4>
+          <p>Raiz quadrada com decimais (aceita até ~4 casas)</p>
+        </button>
+        <button class="mode-card" data-scenario="train">
+          <span class="tag easy">Treino</span>
+          <h4>Vida infinita</h4>
+          <p>Soma com algarismos escolhidos</p>
+        </button>
+      </div>
+
+      <div id="trainConfigPanel" class="train-config hidden">
+        <h4>Configurar Treino</h4>
+        <label for="trainDigits">Algarismos:</label>
+        <input
+          id="trainDigits"
+          type="number"
+          min="1"
+          max="6"
+          value="1"
+          inputmode="numeric"
+        />
+        <label for="trainOperation" style="margin-left: 8px">Operação:</label>
+        <select id="trainOperation">
+          <option value="add">Soma</option>
+          <option value="sub">Subtracao</option>
+          <option value="mul">Multiplicacao</option>
+          <option value="div">Divisao</option>
+          <option value="sqrt">Raiz Quadrada</option>
+        </select>
+        <div style="margin-top: 8px; display: flex; gap: 8px">
+          <button id="trainBackBtn" class="ghost-btn">Voltar</button>
+          <button id="trainStartBtn" class="cta">Começar Treino</button>
+        </div>
       </div>
       <button id="closeMode" class="ghost-btn">Voltar</button>
     </div>
@@ -101,9 +136,9 @@
           <span id="pace" class="value">0</span>
         </div>
       </section>
-
       <section class="arena-wrapper">
         <canvas id="arena" width="960" height="560"></canvas>
+
         <div class="overlay hidden" id="overlay">
           <p class="title" id="overlayTitle">Base invadida</p>
           <p class="subtitle" id="overlaySubtitle">
@@ -117,27 +152,26 @@
             <div class="boss-bar-fill" id="bossBarFill"></div>
           </div>
         </div>
-      </section>
-
-      <section class="terminal-panel">
-        <div class="terminal-inner">
-          <div class="terminal-line">
-            ONDA: <span id="wave">1</span> | VIDA:
-            <span id="healthStatus" class="ok">OK</span>
+        <section class="terminal-panel">
+          <div class="terminal-inner">
+            <div class="terminal-line">
+              ONDA: <span id="wave">1</span> | VIDA:
+              <span id="healthStatus" class="ok">OK</span>
+            </div>
+            <div class="terminal-line">
+              ESCREVA: [
+              <input
+                id="answer"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="59"
+              />
+              ]
+            </div>
           </div>
-          <div class="terminal-line">
-            ESCREVA: [
-            <input
-              id="answer"
-              type="text"
-              inputmode="numeric"
-              autocomplete="off"
-              placeholder="59"
-            />
-            ]
-          </div>
-        </div>
-        <button id="shootBtn" class="shoot-btn">Atirar</button>
+          <button id="shootBtn" class="shoot-btn">Atirar</button>
+        </section>
       </section>
     </main>
 

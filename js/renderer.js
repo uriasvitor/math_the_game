@@ -63,6 +63,9 @@ export class Renderer {
     this.canvas.parentElement?.appendChild(this.labelLayer);
 
     this.resize();
+    this._lastClientWidth = this.canvas.clientWidth;
+    this._lastClientHeight = this.canvas.clientHeight;
+    this._lastDpr = Math.min(window.devicePixelRatio || 1, 2);
   }
 
   setupLights() {
@@ -84,6 +87,7 @@ export class Renderer {
     const plane = new THREE.Mesh(planeGeo, planeMat);
     plane.rotation.x = -Math.PI / 2;
     this.scene.add(plane);
+    this.groundPlane = plane;
   }
 
   buildStarfield() {
@@ -107,6 +111,9 @@ export class Renderer {
       sizeAttenuation: true,
     });
     const stars = new THREE.Points(geo, mat);
+    // remove previous starfield if present
+    if (this.stars) this.scene.remove(this.stars);
+    this.stars = stars;
     this.scene.add(stars);
   }
   loadPlayerTexture() {
@@ -135,10 +142,24 @@ export class Renderer {
     loader.load(
       "images/chars/asteroid.png",
       (tex) => {
-        tex.magFilter = THREE.NearestFilter;
-        tex.minFilter = THREE.NearestFilter;
+        // use linear filtering for smoother scaled rendering and keep aspect ratio
+        tex.magFilter = THREE.LinearFilter;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
         this.enemyTexture = tex;
         this.applyTextureToEnemies("asteroid", tex);
+        // adjust existing asteroid sprite scales to preserve image aspect
+        try {
+          const base = 90;
+          const img = tex.image;
+          const aspect =
+            img && img.width && img.height ? img.width / img.height : 1;
+          for (const mesh of this.enemies.values()) {
+            if (mesh.userData.kind === "asteroid") {
+              // set scale.x proportional to aspect while keeping base height
+              mesh.scale.set(base * aspect, base, 1);
+            }
+          }
+        } catch (e) {}
       },
       undefined,
       () => {
@@ -167,12 +188,25 @@ export class Renderer {
   loadHeartTexture() {
     const loader = new THREE.TextureLoader();
     loader.load(
-      "images/chars/heart.png",
+      "images/chars/health.png",
       (tex) => {
-        tex.magFilter = THREE.NearestFilter;
-        tex.minFilter = THREE.NearestFilter;
+        // use linear filtering for smoother rendering and preserve aspect
+        tex.magFilter = THREE.LinearFilter;
+        tex.minFilter = THREE.LinearMipmapLinearFilter;
         this.heartTexture = tex;
         this.applyTextureToEnemies("heart", tex);
+        // adjust existing heart sprite scales to preserve image aspect
+        try {
+          const base = 70;
+          const img = tex.image;
+          const aspect =
+            img && img.width && img.height ? img.width / img.height : 1;
+          for (const mesh of this.enemies.values()) {
+            if (mesh.userData.kind === "heart") {
+              mesh.scale.set(Math.round(base * aspect), base, 1);
+            }
+          }
+        } catch (e) {}
       },
       undefined,
       () => {
@@ -349,36 +383,120 @@ export class Renderer {
   }
 
   createPlayerSprite() {
-    return this.createSpriteFromTexture(this.playerTexture, { x: 120, y: 120 });
+    // smaller player sprite to match other scaled sprites
+    return this.createSpriteFromTexture(this.playerTexture, { x: 60, y: 60 });
   }
 
   createEnemySprite(kind) {
+    // create sprite using texture aspect to avoid distortion when available
     if (kind === "minion") {
-      return this.createSpriteFromTexture(this.minionTexture, { x: 80, y: 80 });
+      const tex = this.minionTexture;
+      // scaled ~2x smaller
+      const base = 40;
+      const aspect =
+        tex?.image && tex.image.width && tex.image.height
+          ? tex.image.width / tex.image.height
+          : 1;
+      const sprite = this.createSpriteFromTexture(tex, {
+        x: Math.round(base * aspect),
+        y: base,
+      });
+      sprite.material.depthTest = false;
+      sprite.renderOrder = 12;
+      return sprite;
     }
     if (kind === "heart") {
-      return this.createSpriteFromTexture(this.heartTexture, { x: 70, y: 70 });
+      const tex = this.heartTexture;
+      // scaled ~2x smaller
+      const base = 35;
+      const aspect =
+        tex?.image && tex.image.width && tex.image.height
+          ? tex.image.width / tex.image.height
+          : 1;
+      const sprite = this.createSpriteFromTexture(tex, {
+        x: Math.round(base * aspect),
+        y: base,
+      });
+      sprite.material.depthTest = false;
+      sprite.renderOrder = 12;
+      return sprite;
     }
-    return this.createSpriteFromTexture(this.enemyTexture, { x: 90, y: 90 });
+    // asteroid (default) - smaller and render on top so it isn't visually cut by band/ground
+    const tex = this.enemyTexture;
+    const base = 32; // reduced further (~2x from prior)
+    const aspect =
+      tex?.image && tex.image.width && tex.image.height
+        ? tex.image.width / tex.image.height
+        : 1;
+    const sprite = this.createSpriteFromTexture(tex, {
+      x: Math.round(base * aspect),
+      y: base,
+    });
+    sprite.material.depthTest = false;
+    sprite.renderOrder = 10;
+    return sprite;
   }
 
   createBossSprite() {
-    return this.createSpriteFromTexture(this.bossTexture, { x: 160, y: 160 });
+    // boss scaled down for visual consistency
+    return this.createSpriteFromTexture(this.bossTexture, { x: 80, y: 80 });
   }
 
   createBulletMesh() {
     const mat = new THREE.SpriteMaterial({ color: 0x4ef0c8 });
     const sprite = new THREE.Sprite(mat);
-    sprite.scale.set(8, 8, 1);
+    sprite.scale.set(6, 6, 1);
     return sprite;
   }
 
   resize() {
-    const width = this.canvas.clientWidth;
-    const height = this.canvas.clientHeight;
+    const width = Math.max(100, Math.floor(this.canvas.clientWidth));
+    const height = Math.max(100, Math.floor(this.canvas.clientHeight));
+    // update internal size used by world conversions
+    this.width = width;
+    this.height = height;
+
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    this.canvas.width = Math.floor(width * dpr);
+    this.canvas.height = Math.floor(height * dpr);
+
     this.renderer.setSize(width, height, false);
-    this.camera.aspect = width / height;
+    // update orthographic camera frustum to match new size
+    this.camera.left = -this.width / 2;
+    this.camera.right = this.width / 2;
+    this.camera.top = this.height / 2;
+    this.camera.bottom = -this.height / 2;
     this.camera.updateProjectionMatrix();
+
+    // update player position, barrier and ground
+    this.player.x = this.width / 2;
+    this.player.y = this.height - 80;
+    this.player.radius = Math.max(
+      12,
+      Math.round(Math.min(this.width, this.height) * 0.018),
+    );
+    this.barrierY = this.height - 10;
+
+    // recreate barrier line so geometry matches new width/height
+    if (this.barrierLine) {
+      this.scene.remove(this.barrierLine);
+    }
+    this.barrierLine = this.createBarrierLine();
+    this.scene.add(this.barrierLine);
+
+    // update ground plane geometry
+    if (this.groundPlane) {
+      try {
+        this.groundPlane.geometry.dispose();
+      } catch (e) {}
+      this.groundPlane.geometry = new THREE.PlaneGeometry(
+        this.width,
+        this.height,
+      );
+    }
+
+    // rebuild starfield to better fill new area
+    this.buildStarfield();
   }
 
   toWorld(x, y) {
@@ -489,8 +607,10 @@ export class Renderer {
       }
       const mesh = this.enemies.get(enemy.id);
       const pos = this.toWorld(enemy.x, enemy.y);
-      mesh.position.set(pos.x, 18, pos.z);
-      this.updateLabel(enemy.id, enemy.label, mesh.position, this.getLabelOffset(enemy.kind));
+      // raise enemies slightly so they don't get clipped by the barrier band
+      mesh.position.set(pos.x, 20, pos.z);
+      // pass mesh so label offset can be computed dynamically to center above sprite
+      this.updateLabel(enemy.id, enemy.label, mesh.position, mesh);
     });
   }
 
@@ -518,7 +638,7 @@ export class Renderer {
       }
       const mesh = this.bullets.get(idx);
       const pos = this.toWorld(bullet.x, bullet.y);
-      mesh.position.set(pos.x, 18, pos.z);
+      mesh.position.set(pos.x, 20, pos.z);
     });
   }
 
@@ -545,11 +665,39 @@ export class Renderer {
     const projected = position.clone().project(this.camera);
     const x = (projected.x * 0.5 + 0.5) * this.canvas.clientWidth;
     const y = (-projected.y * 0.5 + 0.5) * this.canvas.clientHeight;
-    el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y + offsetY}px)`;
+    let finalOffset = offsetY;
+    // if a mesh was passed, compute pixel offset so label sits just above the sprite
+    if (offsetY && typeof offsetY === "object" && offsetY.scale) {
+      try {
+        const mesh = offsetY;
+        const topWorld = position.clone();
+        topWorld.y += (mesh.scale.y || 0) / 2;
+        const projectedTop = topWorld.project(this.camera);
+        const yTop = (-projectedTop.y * 0.5 + 0.5) * this.canvas.clientHeight;
+        // prefer a small padding of 6px above the sprite
+        finalOffset = Math.round(yTop - y) - 6;
+      } catch (e) {
+        finalOffset = -24;
+      }
+    }
+    el.style.transform = `translate(-50%, -50%) translate(${x}px, ${y + finalOffset}px)`;
   }
 
   draw(state) {
-    this.resize();
+    // only resize (and rebuild starfield) when canvas size or DPR changed
+    const clientW = Math.max(100, Math.floor(this.canvas.clientWidth));
+    const clientH = Math.max(100, Math.floor(this.canvas.clientHeight));
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (
+      clientW !== this._lastClientWidth ||
+      clientH !== this._lastClientHeight ||
+      dpr !== this._lastDpr
+    ) {
+      this.resize();
+      this._lastClientWidth = clientW;
+      this._lastClientHeight = clientH;
+      this._lastDpr = dpr;
+    }
     this.syncPlayer();
     this.syncBoss(state.bossActive ? state.boss : null);
     this.syncEnemies(state.enemies);
