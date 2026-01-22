@@ -14,14 +14,16 @@
   </head>
   <body>
     <div class="start-screen" id="startScreen">
-      <div class="start-card">
+      <div class="start-card" id="mainMenu">
         <p class="eyebrow">Defesa espacial</p>
         <h2>Pilote a nave e defenda a base no vácuo</h2>
-        <p class="lead">
-          Acerte os inimigos digitando os resultados antes que alcancem a base
-          orbital.
-        </p>
-        <button id="heroStart" class="cta">Comecar</button>
+        <p class="lead">Menu principal</p>
+        <div class="menu-buttons">
+          <button id="menuStart" class="cta">Iniciar Jogo</button>
+          <button id="menuScenario" class="ghost-btn">Cenário</button>
+          <button id="menuSettings" class="ghost-btn">Settings</button>
+          <button id="menuScore" class="ghost-btn">Score</button>
+        </div>
       </div>
     </div>
 
@@ -58,6 +60,21 @@
           <span class="tag normal">Raiz</span>
           <h4>Raiz Quadrada</h4>
           <p>Raiz quadrada com decimais (aceita até ~4 casas)</p>
+        </button>
+        <button class="mode-card" data-scenario="pow">
+          <span class="tag hard">Pot</span>
+          <h4>Potenciação</h4>
+          <p>Potências: base^expoente (pequenas bases e expoentes)</p>
+        </button>
+        <button class="mode-card" data-scenario="percent">
+          <span class="tag normal">%</span>
+          <h4>Porcentagem</h4>
+          <p>Calcule porcentagens (aceita decimais)</p>
+        </button>
+        <button class="mode-card" data-scenario="decimal">
+          <span class="tag easy">Dec</span>
+          <h4>Decimais</h4>
+          <p>Operações com números decimais (casas variáveis)</p>
         </button>
         <button class="mode-card" data-scenario="train">
           <span class="tag easy">Treino</span>
@@ -125,6 +142,9 @@
           <option value="mul">Multiplicacao</option>
           <option value="div">Divisao</option>
           <option value="sqrt">Raiz Quadrada</option>
+          <option value="pow">Potenciação</option>
+          <option value="percent">Porcentagem</option>
+          <option value="decimal">Decimais</option>
         </select>
         <div style="margin-top: 8px; display: flex; gap: 8px">
           <button id="trainBackBtn" class="ghost-btn">Voltar</button>
@@ -169,6 +189,9 @@
           <option value="mul">Multiplicacao</option>
           <option value="div">Divisao</option>
           <option value="sqrt">Raiz Quadrada</option>
+          <option value="pow">Potenciação</option>
+          <option value="percent">Porcentagem</option>
+          <option value="decimal">Decimais</option>
         </select>
         <div style="margin-top: 8px; display: flex; gap: 8px">
           <button id="sbBackBtn" class="ghost-btn">Voltar</button>
@@ -275,6 +298,24 @@
           <button id="cancelResetBtn" class="ghost-btn">Cancelar</button>
           <button id="confirmResetBtn" class="cta">Deletar Tudo</button>
         </div>
+      </div>
+    </div>
+
+    <!-- Score panel -->
+    <div
+      id="scorePanel"
+      class="train-config hidden"
+      style="position: fixed; right: 18px; top: 80px; width: 320px"
+    >
+      <h4>Placar</h4>
+      <div id="scoreList">
+        <div>Somar: <strong id="best_add">0</strong></div>
+        <div>Subtrair: <strong id="best_sub">0</strong></div>
+        <div>Multiplicar: <strong id="best_mul">0</strong></div>
+        <div>Dividir: <strong id="best_div">0</strong></div>
+      </div>
+      <div style="margin-top: 8px; display: flex; gap: 8px">
+        <button id="scoreCloseBtn" class="ghost-btn">Fechar</button>
       </div>
     </div>
 

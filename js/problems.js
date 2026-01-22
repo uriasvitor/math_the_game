@@ -103,6 +103,32 @@ export class ProblemGenerator {
         const ans = Math.sqrt(n);
         return { label: `√${n}`, answer: Number(ans.toFixed(6)) };
       },
+      pow: () => {
+        // potenciação: choose small base and exponent to keep numbers reasonable
+        const base = Math.max(
+          2,
+          randInt(2, Math.min(9, Math.pow(10, digits.max) - 1)),
+        );
+        const exp = Math.max(2, randInt(2, Math.min(4, digits.max)));
+        const val = Math.pow(base, exp);
+        return { label: `${base} ^ ${exp}`, answer: val };
+      },
+      percent: () => {
+        // porcentagem: p% de N
+        const p = Math.max(1, randInt(1, 100));
+        const n = randWithDigits(digits.min, digits.max);
+        const ans = (p / 100) * n;
+        // show percentage with % symbol
+        return { label: `${p}% de ${n}`, answer: Number(ans.toFixed(4)) };
+      },
+      decimal: () => {
+        // generate two decimal numbers and add them (can be extended later)
+        const aInt = randWithDigits(Math.max(1, digits.min - 1), digits.max);
+        const bInt = randWithDigits(Math.max(1, digits.min - 1), digits.max);
+        const a = Number((aInt + Math.random()).toFixed(2));
+        const b = Number((bInt + Math.random()).toFixed(2));
+        return { label: `${a} + ${b}`, answer: Number((a + b).toFixed(4)) };
+      },
     };
     // allow training mode to specify an operation (e.g. 'sqrt', 'mul') via options.operation
     const op =

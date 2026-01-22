@@ -124,6 +124,8 @@ function openModeSelection() {
 
 function closeModeSelection() {
   modeScreen.classList.add("hidden");
+  // remove scenario-only filter when closing
+  if (modeScreen) modeScreen.classList.remove("scenario-only");
   // ensure we return to the start screen (do not reveal a paused game)
   if (startScreen) startScreen.classList.remove("hidden");
   // hide any sub-panels that may be open
@@ -150,6 +152,10 @@ function getTrainingOperation() {
   if (!trainOperationSelect) return "add";
   const v = String(trainOperationSelect.value || "add");
   const allowed = new Set(["add", "sub", "mul", "div", "sqrt"]);
+  // allow new operations: potenciação (pow), porcentagem (percent), decimais
+  allowed.add("pow");
+  allowed.add("percent");
+  allowed.add("decimal");
   return allowed.has(v) ? v : "add";
 }
 
@@ -340,6 +346,65 @@ updateAttemptsDisplay();
 if (sbStartBtn) {
   sbStartBtn.addEventListener("click", () => pickScenario("sandbox"));
 }
+
+// Main menu buttons
+const menuStart = document.getElementById("menuStart");
+const menuScenario = document.getElementById("menuScenario");
+const menuSettings = document.getElementById("menuSettings");
+const menuScore = document.getElementById("menuScore");
+const scorePanel = document.getElementById("scorePanel");
+const scoreCloseBtn = document.getElementById("scoreCloseBtn");
+
+if (menuStart)
+  menuStart.addEventListener("click", () => {
+    // open full mode selection (no scenario-only filter)
+    startScreen.classList.add("hidden");
+    modeScreen.classList.remove("hidden");
+    modeScreen.classList.remove("scenario-only");
+    const grid = modeScreen.querySelector(".mode-grid");
+    if (grid) grid.classList.remove("hidden");
+    if (closeMode) closeMode.classList.remove("hidden");
+  });
+if (menuScenario)
+  menuScenario.addEventListener("click", () => {
+    // show only train and sandbox options
+    startScreen.classList.add("hidden");
+    modeScreen.classList.remove("hidden");
+    modeScreen.classList.add("scenario-only");
+    const grid = modeScreen.querySelector(".mode-grid");
+    if (grid) grid.classList.remove("hidden");
+    if (closeMode) closeMode.classList.remove("hidden");
+  });
+if (menuSettings)
+  menuSettings.addEventListener("click", () => {
+    // open mods/settings panel
+    startScreen.classList.add("hidden");
+    modeScreen.classList.remove("hidden");
+    const grid = modeScreen.querySelector(".mode-grid");
+    if (grid) grid.classList.add("hidden");
+    const modsPanel = document.getElementById("modsPanel");
+    if (modsPanel) modsPanel.classList.remove("hidden");
+    if (closeMode) closeMode.classList.add("hidden");
+  });
+if (menuScore)
+  menuScore.addEventListener("click", () => {
+    try {
+      if (scorePanel) scorePanel.classList.remove("hidden");
+      // populate best scores
+      const bAdd = document.getElementById("best_add");
+      const bSub = document.getElementById("best_sub");
+      const bMul = document.getElementById("best_mul");
+      const bDiv = document.getElementById("best_div");
+      if (bAdd) bAdd.textContent = String(storage.getBest("add") || 0);
+      if (bSub) bSub.textContent = String(storage.getBest("sub") || 0);
+      if (bMul) bMul.textContent = String(storage.getBest("mul") || 0);
+      if (bDiv) bDiv.textContent = String(storage.getBest("div") || 0);
+    } catch (e) {}
+  });
+if (scoreCloseBtn)
+  scoreCloseBtn.addEventListener("click", () => {
+    if (scorePanel) scorePanel.classList.add("hidden");
+  });
 
 pauseBtn.addEventListener("click", () => game.pause());
 

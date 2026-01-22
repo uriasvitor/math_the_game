@@ -1,82 +1,117 @@
 # Math Defender
 
-Math Defender is a browser-based typing / math-practice game built with plain JavaScript and THREE.js for sprite rendering. Defend the base by typing answers to arithmetic problems before enemies reach the orbital barrier.
+Math Defender é um jogo de digitação e prática matemática no navegador, feito em JavaScript puro e THREE.js para renderização de sprites. Defenda a base digitando as respostas antes que os inimigos cheguem à barreira orbital.
 
-**Key Features**
+**Principais recursos / Key Features**
 
-- Multiple game modes: addition, subtraction, multiplication, division, square root.
-- Training mode with configurable digits and operation.
-- Sandbox mode for manual spawning of enemies (asteroids, minions, hearts, boss).
-- "Recuperação" (Recovery) mode — practices the problems you miss most.
-- Mods: Auto Reset (auto-restart after game end) and One-Strike (lose on first base hit).
-- Local persistence for best scores and failure statistics (localStorage).
-- Lightweight audio cues for spawn / hit / destroy / coin.
+- Menu principal com acesso rápido aos modos: Soma, Subtração, Multiplicação, Divisão, Raiz, Potenciação, Porcentagem, Decimais.
+- Modos especiais: Treinamento (configurável), Sandbox (spawn manual), Recuperação (pratique o que mais erra).
+- Mods: Auto Reset, One-Strike, Auto Restart on Loss.
+- Persistência local de recordes e erros (localStorage).
+- Áudio leve para feedback de ações.
 
-**Quick Start**
+**Como jogar / Quick Start**
 
-- Open `index.html` in a modern browser. For full functionality (ES modules + fetch) use a local server:
+Abra `index.html` em um navegador moderno. Para evitar problemas de CORS/ESM, use um servidor local:
 
 ```bash
-# Python 3 recommended
+# Python 3 recomendado
 python -m http.server 8000
-# then open http://localhost:8000 in your browser
+# depois acesse http://localhost:8000
 ```
 
-**Controls**
+**Navegação / Navigation**
 
-- Type the result of the problem in the input and press Enter or click "Atirar" to shoot.
-- `Niveis` opens the mode selector (or click "Começar" on the start screen).
-- `Mods` opens the mods panel (or press `M`).
-- `Resetar tudo` opens a confirmation modal and clears all saved progress.
+- Menu principal: Iniciar Jogo (modos principais), Cenário (Treinamento, Sandbox, Recuperação), Settings (mods), Score (placar).
+- Use o teclado ou clique para responder.
+- `M` abre o painel de mods.
+- `'` reinicia e inicia o jogo imediatamente.
+- `F` abre a seleção de modos.
 
-**Game Modes**
+**Modos de Jogo / Game Modes**
 
-- `Soma` / `Subtracao` / `Multiplicacao` / `Divisao` / `Raiz`: main level gameplay — enemies spawn with problems appropriate to the mode.
-- `Treino`: configure digits and operation. Training shows infinite life in the HUD and is ideal for focused practice.
-- `Sandbox`: spawn entities manually for testing or practice; provides immediate labels and spawn sounds.
-- `Recuperação`: focuses on the problems you miss most (only problems with repeated misses are included — the default threshold is 10 misses).
+- Soma, Subtração, Multiplicação, Divisão, Raiz Quadrada, Potenciação, Porcentagem, Decimais: cada um com problemas próprios.
+- Treinamento: escolha operação e número de dígitos, vida infinita.
+- Sandbox: spawn manual de entidades para testar.
+- Recuperação: só aparece no menu Cenário, foca nos problemas que você mais erra (após 10 erros).
 
 **Mods**
 
-- Auto Reset: when enabled, the game automatically restarts a short moment after it ends.
-- One-Strike: a single base hit ends the run immediately.
-- Mods are saved in localStorage under the key `md_mods`.
+- Auto Reset: reinicia automaticamente após perder.
+- One-Strike: perdeu uma vida, fim de jogo.
+- Auto Restart on Loss: reinicia só se perder.
 
-**Persistence & Recovery Mechanics**
+**Persistência / Persistence**
 
-- Best scores are saved via `StorageManager` using the key configured in `js/config.js` (constant `STORAGE_KEY`).
-- Missed problems (for Recovery mode) are recorded by `StorageManager.registerFailure(label, answer)` when an enemy reaches the barrier — but misses are NOT recorded during `train` or `sandbox` modes.
-- The Recovery list exposes only problems missed at least N times (default N = 10). Successes in `recuperacao` call `registerSuccess(label)` and decrement the counter; once the counter reaches 0 the problem is removed from the list.
-- To clear saved highs and failure logs: use the "Resetar tudo" button and confirm in the modal.
+- Recordes e erros salvos em localStorage.
+- "Resetar tudo" apaga todo o progresso.
 
-**Files of Interest (editing / extending)**
+**Dicas / Tips**
 
-- `index.html`: UI and mode panels.
-- `main.js`: app wiring, UI handlers, and session tracking (attempt counter).
-- `js/game.js`: core game loop, spawn logic, mods handling, `spawnCustom()` API, and hooks for recovery tracking.
-- `js/problems.js`: problem generation; add/remove operations or tweak difficulty here.
-- `js/renderer.js`: THREE.js rendering helpers and label overlays.
-- `js/audio.js`: sound generation and effects.
-- `js/storage.js`: persistence logic — best scores and failure counters (useful for `recuperacao`).
-- `js/config.js`: constants such as `TOTAL_TIME`, scenarios and speed/spawn tuning.
-- `styles/style.css`: visual theme; panels now follow the terminal-panel style.
+- Use o modo Sandbox para testar sons e labels.
+- Para popular o modo Recuperação, erre o mesmo problema várias vezes em modos normais.
 
-**Developer Notes & Customization**
+**Personalização / Customization**
 
-- To change the recovery threshold (how many misses before a problem is included), edit `THRESHOLD` in `js/storage.js` inside `getTopFailures()`.
-- To add a new operation (for example: powers or modulus), update `js/problems.js` with a handler and, if needed, add a scenario entry in `js/config.js`.
-- To change sprite sizes or rendering order, modify `js/renderer.js`.
-- Audio requires user gesture in the page to allow playback — clicking the canvas or buttons activates audio.
+- Para adicionar operações, edite `js/problems.js` e `js/config.js`.
+- Para mudar o limiar de recuperação, altere `THRESHOLD` em `js/storage.js`.
 
-**Testing Tips**
+---
 
-- Use `Sandbox` to spawn specific enemies and confirm labels and audio.
-- To simulate repeated misses for `Recuperação`, play a normal mode (not train/sandbox), let the same problem pass multiple times, then open `Recuperação`.
+## GitHub Pages
 
-**Known Behavior**
+Jogue online: [math-the-game (GitHub Pages)](https://seu-usuario.github.io/math-the-game/)
 
-- Training and Sandbox do not contribute to the recovery failure counters (by design).
-- Recovery problems are chosen from the top N missed problems (sorted by miss count).
+---
+
+**ENGLISH**
+
+Math Defender is a browser-based typing/math game. Defend the base by typing answers before enemies reach the barrier.
+
+**Main features**
+
+- Main menu: quick access to all modes (Addition, Subtraction, Multiplication, Division, Square Root, Power, Percentage, Decimals).
+- Special modes: Training (configurable), Sandbox (manual spawn), Recovery (practice your most missed problems).
+- Mods: Auto Reset, One-Strike, Auto Restart on Loss.
+- Local persistence for best scores and failures (localStorage).
+- Lightweight audio feedback.
+
+**How to play**
+
+- Open `index.html` in a modern browser (use a local server for best results).
+- Main menu: Start Game (main modes), Scenario (Training, Sandbox, Recovery), Settings (mods), Score (highscores).
+- Use keyboard or click to answer.
+- `M` opens mods panel.
+- `'` restarts and starts the game instantly.
+- `F` opens mode selection.
+
+**Game Modes**
+
+- Addition, Subtraction, Multiplication, Division, Square Root, Power, Percentage, Decimals: each with its own problems.
+- Training: choose operation and digits, infinite life.
+- Sandbox: manual spawn for testing.
+- Recovery: only in Scenario menu, focuses on your most missed problems (after 10 misses).
+
+**Mods**
+
+- Auto Reset: auto-restart after loss.
+- One-Strike: lose on first hit.
+- Auto Restart on Loss: restart only if you lose.
+
+**Persistence**
+
+- Highscores and failures saved in localStorage.
+- "Reset all" erases all progress.
+
+**Tips**
+
+- Use Sandbox to test sounds and labels.
+- To fill Recovery, miss the same problem several times in normal modes.
+
+**Customization**
+
+- To add operations, edit `js/problems.js` and `js/config.js`.
+- To change recovery threshold, edit `THRESHOLD` in `js/storage.js`.
 
 **Contributing**
 

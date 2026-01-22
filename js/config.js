@@ -33,6 +33,9 @@ export const scenarios = {
   mul: { name: "Multiplicacao", spawn: 2.0, speed: 55 },
   div: { name: "Divisao", spawn: 2.1, speed: 48 },
   sqrt: { name: "Raiz", spawn: 2.2, speed: 45 },
+  pow: { name: "Potenciação", spawn: 2.0, speed: 50 },
+  percent: { name: "Porcentagem", spawn: 2.0, speed: 50 },
+  decimal: { name: "Decimais", spawn: 2.0, speed: 50 },
 };
 
 export function formatTime(seconds) {
