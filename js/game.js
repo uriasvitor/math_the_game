@@ -82,7 +82,21 @@ export class Game {
 
   getPace() {
     const progress = Math.min(1, this.elapsed / TOTAL_TIME);
-    return 0.2 + progress * 1.6;
+    // base pace (spawns per second) grows with progress
+    const base = 0.2 + progress * 1.6;
+    // difficulty modifiers per scenario (reduce pace for easy/add)
+    const modifiers = {
+      add: 0.55, // easier: fewer spawns over time
+      train: 0.6,
+      sandbox: 0.6,
+      sub: 0.95,
+      mul: 1.05,
+      div: 1.0,
+      sqrt: 1.0,
+      recuperacao: 0.7,
+    };
+    const m = modifiers[this.state.scenario] ?? 1.0;
+    return Math.max(0.05, base * m);
   }
 
   isTraining() {

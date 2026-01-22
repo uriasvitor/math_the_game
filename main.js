@@ -172,7 +172,9 @@ function pickScenario(mode) {
 
 shootBtn.addEventListener("click", () => game.handleShot(answerInput.value));
 document.addEventListener("keydown", (event) => {
-  if (event.key === "Enter") {
+  const k = event.key;
+  // Enter: either submit shot or, when overlay is visible, reset+start
+  if (k === "Enter") {
     if (!overlay.classList.contains("hidden")) {
       game.reset();
       game.start();
@@ -180,6 +182,24 @@ document.addEventListener("keydown", (event) => {
       return;
     }
     game.handleShot(answerInput.value);
+    return;
+  }
+
+  // 'f' (case-insensitive) opens the mode selection screen
+  if (k.toLowerCase && k.toLowerCase() === "f") {
+    openModeSelection();
+    event.preventDefault();
+    return;
+  }
+
+  // Single-quote (') — always reset and immediately start the game
+  if (k === "'") {
+    try {
+      game.reset();
+      game.start();
+      event.preventDefault();
+    } catch (err) {}
+    return;
   }
 });
 
