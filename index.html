@@ -23,6 +23,7 @@
       </div>
       <div class="controls">
         <button id="startBtn">Niveis</button>
+        <button id="modsBtn" class="ghost-btn small">Mods</button>
         <button id="pauseBtn">Pausar</button>
         <button id="resetBtn">Reiniciar</button>
         <button id="resetAllBtn" class="ghost-btn small">Resetar tudo</button>
@@ -85,6 +86,37 @@
           <h4>Sandbox</h4>
           <p>Spawn manual: chefao, asteróide, vida</p>
         </button>
+        <button class="mode-card" data-scenario="recuperacao">
+          <span class="tag normal">Recup</span>
+          <h4>Recuperação</h4>
+          <p>Pratique intensivamente as contas que você mais erra</p>
+        </button>
+      </div>
+
+      <!-- Mods panel (osu-style) -->
+      <div id="modsPanel" class="train-config hidden" style="margin-top: 12px">
+        <h4>Mods</h4>
+        <p class="muted">Escolha alterações de partida (modo estilo osu).</p>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+          "
+        >
+          <label
+            ><input type="checkbox" id="modAutoReset" /> Auto Reset — reinicia
+            automaticamente quando a partida termina</label
+          >
+          <label
+            ><input type="checkbox" id="modOneStrike" /> One-Strike — falhe uma
+            vez e perde imediatamente</label
+          >
+        </div>
+        <div style="margin-top: 8px; display: flex; gap: 8px">
+          <button id="modsCloseBtn" class="ghost-btn">Fechar</button>
+        </div>
       </div>
 
       <div id="trainConfigPanel" class="train-config hidden">
@@ -187,6 +219,8 @@
         </div>
       </section>
       <section class="arena-wrapper">
+        <div id="attemptsCounter" class="attempts-counter">Tentativas: 0</div>
+
         <canvas id="arena" width="960" height="560"></canvas>
 
         <div class="overlay hidden" id="overlay">

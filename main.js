@@ -9,6 +9,7 @@ const canvas = document.getElementById("arena");
 const answerInput = document.getElementById("answer");
 const shootBtn = document.getElementById("shootBtn");
 const startBtn = document.getElementById("startBtn");
+const modsBtn = document.getElementById("modsBtn");
 const pauseBtn = document.getElementById("pauseBtn");
 const resetBtn = document.getElementById("resetBtn");
 const playAgainBtn = document.getElementById("playAgain");
@@ -67,6 +68,38 @@ const hud = new Hud({
 });
 const game = new Game({ renderer, hud, audio, storage, answerInput });
 
+// attempt counter for current session
+const attemptsCounterEl = document.getElementById("attemptsCounter");
+let sessionAttempts = 0;
+
+function updateAttemptsDisplay() {
+  if (!attemptsCounterEl) return;
+  attemptsCounterEl.textContent = `Tentativas: ${sessionAttempts}`;
+}
+
+// load mods from localStorage
+const modAutoResetEl = document.getElementById("modAutoReset");
+const modOneStrikeEl = document.getElementById("modOneStrike");
+const modsCloseBtn = document.getElementById("modsCloseBtn");
+function loadMods() {
+  try {
+    const raw = localStorage.getItem("md_mods");
+    if (!raw) return { autoReset: false, oneStrike: false };
+    return JSON.parse(raw);
+  } catch (e) {
+    return { autoReset: false, oneStrike: false };
+  }
+}
+function saveMods(mods) {
+  try {
+    localStorage.setItem("md_mods", JSON.stringify(mods));
+  } catch (e) {}
+}
+const initialMods = loadMods();
+if (modAutoResetEl) modAutoResetEl.checked = !!initialMods.autoReset;
+if (modOneStrikeEl) modOneStrikeEl.checked = !!initialMods.oneStrike;
+game.setMods && game.setMods(initialMods);
+
 function openModeSelection() {
   startScreen.classList.add("hidden");
   modeScreen.classList.remove("hidden");
@@ -104,6 +137,9 @@ function pickScenario(mode) {
     game.setScenario(mode);
   }
   game.reset();
+  // increment attempts when a run is actually started
+  sessionAttempts++;
+  updateAttemptsDisplay();
   game.start();
   closeModeSelection();
   startScreen.classList.add("hidden");
@@ -124,7 +160,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 startBtn.addEventListener("click", openModeSelection);
-heroStart.addEventListener("click", openModeSelection);
+if (heroStart) heroStart.addEventListener("click", openModeSelection);
 closeMode.addEventListener("click", closeModeSelection);
 modeCards.forEach((card) => {
   card.addEventListener("click", () => {
@@ -172,6 +208,39 @@ if (sbBackBtn) {
   });
 }
 
+// mods close handler
+if (modsCloseBtn) {
+  modsCloseBtn.addEventListener("click", () => {
+    const modsPanel = document.getElementById("modsPanel");
+    if (modsPanel) modsPanel.classList.add("hidden");
+    const grid = modeScreen.querySelector(".mode-grid");
+    if (grid) grid.classList.remove("hidden");
+    if (closeMode) closeMode.classList.remove("hidden");
+  });
+}
+
+// wire mod toggles
+if (modAutoResetEl) {
+  modAutoResetEl.addEventListener("change", () => {
+    const mods = {
+      autoReset: !!modAutoResetEl.checked,
+      oneStrike: !!modOneStrikeEl.checked,
+    };
+    saveMods(mods);
+    game.setMods && game.setMods(mods);
+  });
+}
+if (modOneStrikeEl) {
+  modOneStrikeEl.addEventListener("change", () => {
+    const mods = {
+      autoReset: !!modAutoResetEl.checked,
+      oneStrike: !!modOneStrikeEl.checked,
+    };
+    saveMods(mods);
+    game.setMods && game.setMods(mods);
+  });
+}
+
 if (sbSpawnBtn) {
   sbSpawnBtn.addEventListener("click", () => {
     const kind = sbEntity.value || "asteroid";
@@ -184,6 +253,32 @@ if (sbSpawnBtn) {
     audio.playSpawn();
   });
 }
+
+// open Mods panel from mode screen via keyboard shortcut 'M' or add a small click target
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "m") {
+    const grid = modeScreen.querySelector(".mode-grid");
+    if (grid) grid.classList.add("hidden");
+    const modsPanel = document.getElementById("modsPanel");
+    if (modsPanel) modsPanel.classList.remove("hidden");
+    if (closeMode) closeMode.classList.add("hidden");
+  }
+});
+
+if (modsBtn) {
+  modsBtn.addEventListener("click", () => {
+    // show mode screen and open mods panel
+    startScreen.classList.add("hidden");
+    modeScreen.classList.remove("hidden");
+    const grid = modeScreen.querySelector(".mode-grid");
+    if (grid) grid.classList.add("hidden");
+    const modsPanel = document.getElementById("modsPanel");
+    if (modsPanel) modsPanel.classList.remove("hidden");
+    if (closeMode) closeMode.classList.add("hidden");
+  });
+}
+
+updateAttemptsDisplay();
 
 if (sbStartBtn) {
   sbStartBtn.addEventListener("click", () => pickScenario("sandbox"));

@@ -28,6 +28,7 @@ export const scenarios = {
   add: { name: "Soma", spawn: 1.8, speed: 45 },
   train: { name: "Treino", spawn: 1.8, speed: 45 },
   sandbox: { name: "Sandbox", spawn: 1.8, speed: 45 },
+  recuperacao: { name: "Recuperação", spawn: 1.6, speed: 45 },
   sub: { name: "Subtracao", spawn: 2.0, speed: 50 },
   mul: { name: "Multiplicacao", spawn: 2.0, speed: 55 },
   div: { name: "Divisao", spawn: 2.1, speed: 48 },

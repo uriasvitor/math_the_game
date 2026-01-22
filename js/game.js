@@ -22,12 +22,20 @@ export class Game {
     this.storage = storage;
     this.answerInput = answerInput;
     this.problemGen = new ProblemGenerator();
+    this.mods = { autoReset: false, oneStrike: false };
 
     // training elapsed time counter (unbounded) so training pace can grow
     this._trainingElapsed = 0;
 
     this.state = this.createInitialState();
     this.hud.setPhaseLabel(this.getScenarioLabel());
+  }
+
+  setMods(mods = {}) {
+    this.mods = {
+      autoReset: !!mods.autoReset,
+      oneStrike: !!mods.oneStrike,
+    };
   }
 
   createInitialState() {
@@ -290,6 +298,27 @@ export class Game {
       this.spawnHeart();
       return;
     }
+    // Recuperação mode: spawn previously-missed problems preferentially
+    if (this.state.scenario === "recuperacao" && this.storage) {
+      const top = this.storage.getTopFailures(12) || [];
+      if (top.length) {
+        const pick = top[randInt(0, top.length - 1)];
+        const speed = scenarios[this.state.scenario]?.speed || 45;
+        const enemy = {
+          id: this.state.enemyId++,
+          x: randInt(80, this.renderer.canvas.width - 80),
+          y: -40,
+          speed,
+          drift: 0,
+          label: pick.label,
+          answer: pick.answer,
+          wobble: Math.random() * Math.PI * 2,
+          kind: "asteroid",
+        };
+        this.state.enemies.push(enemy);
+        return;
+      }
+    }
     const problem = this.problemGen.next(
       this.state.scenario,
       this.elapsed,
@@ -456,6 +485,12 @@ export class Game {
 
   damageBase() {
     if (this.isTraining()) return;
+    // one-strike mod: any hit ends the run immediately
+    if (this.mods && this.mods.oneStrike) {
+      this.audio.playDamage();
+      this.finish("base");
+      return;
+    }
     this.state.baseLife -= 1;
     this.audio.playDamage();
     this.updateHud();
@@ -513,6 +548,16 @@ export class Game {
         "Partida encerrada",
         "Clique em Reiniciar para jogar de novo.",
       );
+    }
+
+    // auto-reset mod: restart automatically after a short delay
+    if (this.mods && this.mods.autoReset) {
+      try {
+        setTimeout(() => {
+          this.resetRunState();
+          this.start();
+        }, 800);
+      } catch (e) {}
     }
   }
 
@@ -586,6 +631,11 @@ export class Game {
           );
         }
         if (enemy.kind !== "heart") {
+          // register missed problem for recovery tracking
+          try {
+            this.storage.registerFailure &&
+              this.storage.registerFailure(enemy.label, enemy.answer);
+          } catch (e) {}
           this.damageBase();
         }
         return false;
