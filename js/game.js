@@ -35,6 +35,7 @@ export class Game {
   setMods(mods = {}) {
     this.mods = {
       autoReset: !!mods.autoReset,
+      autoResetOnLoss: !!mods.autoResetOnLoss,
       oneStrike: !!mods.oneStrike,
     };
   }
@@ -561,8 +562,11 @@ export class Game {
       );
     }
 
-    // auto-reset mod: restart automatically after a short delay
-    if (this.mods && this.mods.autoReset) {
+    // auto-reset mods: restart automatically after a short delay
+    if (
+      this.mods &&
+      (this.mods.autoReset || (this.mods.autoResetOnLoss && reason === "base"))
+    ) {
       try {
         setTimeout(() => {
           this.resetRunState();
