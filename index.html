@@ -1,95 +1,278 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Math Defender</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header class="banner">
-    <div class="brand">
-      <span class="badge">Novo</span>
-      <div>
-        <p class="eyebrow">Jogo de digitação</p>
-        <h1>Math Defender</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Defender</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles/style.css" />
+  </head>
+  <body>
+    <div class="start-screen" id="startScreen">
+      <div class="start-card">
+        <p class="eyebrow">Defesa espacial</p>
+        <h2>Pilote a nave e defenda a base no vácuo</h2>
+        <p class="lead">
+          Acerte os inimigos digitando os resultados antes que alcancem a base
+          orbital.
+        </p>
+        <button id="heroStart" class="cta">Comecar</button>
       </div>
     </div>
-    <div class="controls">
-      <label for="scenario">Cenário</label>
-      <select id="scenario">
-        <option value="add">Soma</option>
-        <option value="sub">Subtração</option>
-        <option value="mul">Multiplicação</option>
-        <option value="div">Divisão</option>
-      </select>
-      <button id="startBtn">Iniciar</button>
-      <button id="pauseBtn">Pausar</button>
-      <button id="resetBtn">Reiniciar</button>
+
+    <div class="mode-screen hidden" id="modeScreen">
+      <div class="mode-header">
+        <h3>Escolha o nivel</h3>
+        <p>
+          Cenarios principais: comece na soma e avance para subtracao,
+          multiplicacao e divisao. Use o treino para praticar.
+        </p>
+      </div>
+      <div class="mode-grid">
+        <button class="mode-card" data-scenario="add">
+          <span class="tag easy">Nivel 1</span>
+          <h4>Soma</h4>
+          <p>Treino: 1, 2 e 3 digitos</p>
+        </button>
+        <button class="mode-card" data-scenario="sub">
+          <span class="tag normal">Nivel 2</span>
+          <h4>Subtracao</h4>
+          <p>Digitos 1-10 - ritmo medio</p>
+        </button>
+        <button class="mode-card" data-scenario="mul">
+          <span class="tag hard">Nivel 3</span>
+          <h4>Multiplicacao</h4>
+          <p>Tabuada ate 10 - ritmo alto</p>
+        </button>
+        <button class="mode-card" data-scenario="div">
+          <span class="tag elite">Nivel 4</span>
+          <h4>Divisao</h4>
+          <p>Quocientes inteiros - ritmo variavel</p>
+        </button>
+        <button class="mode-card" data-scenario="sqrt">
+          <span class="tag normal">Raiz</span>
+          <h4>Raiz Quadrada</h4>
+          <p>Raiz quadrada com decimais (aceita até ~4 casas)</p>
+        </button>
+        <button class="mode-card" data-scenario="train">
+          <span class="tag easy">Treino</span>
+          <h4>Vida infinita</h4>
+          <p>Soma com algarismos escolhidos</p>
+        </button>
+        <button class="mode-card" data-scenario="sandbox">
+          <span class="tag elite">Sandbox</span>
+          <h4>Sandbox</h4>
+          <p>Spawn manual: chefao, asteróide, vida</p>
+        </button>
+        <button class="mode-card" data-scenario="recuperacao">
+          <span class="tag normal">Recup</span>
+          <h4>Recuperação</h4>
+          <p>Pratique intensivamente as contas que você mais erra</p>
+        </button>
+      </div>
+
+      <!-- Mods panel (osu-style) -->
+      <div id="modsPanel" class="train-config hidden" style="margin-top: 12px">
+        <h4>Mods</h4>
+        <p class="muted">Escolha alterações de partida (modo estilo osu).</p>
+        <div
+          style="
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 8px;
+          "
+        >
+          <label
+            ><input type="checkbox" id="modAutoReset" /> Auto Reset — reinicia
+            automaticamente quando a partida termina</label
+          >
+          <label
+            ><input type="checkbox" id="modOneStrike" /> One-Strike — falhe uma
+            vez e perde imediatamente</label
+          >
+        </div>
+        <div style="margin-top: 8px; display: flex; gap: 8px">
+          <button id="modsCloseBtn" class="ghost-btn">Fechar</button>
+        </div>
+      </div>
+
+      <div id="trainConfigPanel" class="train-config hidden">
+        <h4>Configurar Treino</h4>
+        <label for="trainDigits">Algarismos:</label>
+        <input
+          id="trainDigits"
+          type="number"
+          min="1"
+          max="6"
+          value="1"
+          inputmode="numeric"
+        />
+        <label for="trainOperation" style="margin-left: 8px">Operação:</label>
+        <select id="trainOperation">
+          <option value="add">Soma</option>
+          <option value="sub">Subtracao</option>
+          <option value="mul">Multiplicacao</option>
+          <option value="div">Divisao</option>
+          <option value="sqrt">Raiz Quadrada</option>
+        </select>
+        <div style="margin-top: 8px; display: flex; gap: 8px">
+          <button id="trainBackBtn" class="ghost-btn">Voltar</button>
+          <button id="trainStartBtn" class="cta">Começar Treino</button>
+        </div>
+      </div>
+      <div
+        id="sandboxPanel"
+        class="train-config hidden"
+        style="margin-top: 12px"
+      >
+        <h4>Sandbox</h4>
+        <label for="sbEntity">Entidade:</label>
+        <select id="sbEntity">
+          <option value="asteroid">Asteroid</option>
+          <option value="boss">Boss</option>
+          <option value="heart">Vida</option>
+          <option value="minion">Minion</option>
+        </select>
+        <label for="sbCount" style="margin-left: 8px">Quantidade:</label>
+        <input
+          id="sbCount"
+          type="number"
+          min="1"
+          max="20"
+          value="1"
+          style="width: 64px"
+        />
+        <label for="sbDigits" style="margin-left: 8px">Algarismos:</label>
+        <input
+          id="sbDigits"
+          type="number"
+          min="1"
+          max="6"
+          value="1"
+          style="width: 64px"
+        />
+        <label for="sbOperation" style="margin-left: 8px">Operação:</label>
+        <select id="sbOperation">
+          <option value="add">Soma</option>
+          <option value="sub">Subtracao</option>
+          <option value="mul">Multiplicacao</option>
+          <option value="div">Divisao</option>
+          <option value="sqrt">Raiz Quadrada</option>
+        </select>
+        <div style="margin-top: 8px; display: flex; gap: 8px">
+          <button id="sbBackBtn" class="ghost-btn">Voltar</button>
+          <button id="sbSpawnBtn" class="cta">Spawn</button>
+          <button id="sbStartBtn" class="cta">Começar Sandbox</button>
+        </div>
+      </div>
+      <button id="closeMode" class="ghost-btn">Voltar</button>
     </div>
-  </header>
 
-  <main>
-    <section class="hud">
-      <div class="stat">
-        <span class="label">Base</span>
-        <span id="baseLife" class="value">3</span>
-      </div>
-      <div class="stat">
-        <span class="label">Pontos</span>
-        <span id="score" class="value">0</span>
-      </div>
-      <div class="stat">
-        <span class="label">Recorde</span>
-        <span id="bestScore" class="value">0</span>
-      </div>
-      <div class="stat">
-        <span class="label">Fase</span>
-        <span id="phase" class="value">Soma</span>
-      </div>
-      <div class="stat">
-        <span class="label">Tempo</span>
-        <span id="timeLeft" class="value">03:00</span>
-      </div>
-      <div class="stat">
-        <span class="label">Velocidade</span>
-        <span id="pace" class="value">0</span>
-      </div>
-    </section>
+    <main>
+      <header class="banner">
+        <div class="brand">
+          <span class="badge">Novo</span>
+          <div>
+            <p class="eyebrow">Jogo de digitacao</p>
+            <h1>Math Defender</h1>
+          </div>
+        </div>
+        <div class="controls">
+          <button id="startBtn">Niveis</button>
+          <button id="modsBtn" class="ghost-btn small">Mods</button>
+          <button id="pauseBtn">Pausar</button>
+          <button id="resetBtn">Reiniciar</button>
+          <button id="resetAllBtn" class="ghost-btn small">Resetar tudo</button>
+        </div>
+      </header>
+      <section class="hud">
+        <div class="stat">
+          <span class="label">Base</span>
+          <span id="baseLife" class="value">3</span>
+        </div>
+        <div class="stat">
+          <span class="label">Pontos</span>
+          <span id="score" class="value">0</span>
+        </div>
+        <div class="stat">
+          <span class="label">Recorde</span>
+          <span id="bestScore" class="value">0</span>
+        </div>
+        <div class="stat">
+          <span class="label">Fase</span>
+          <span id="phase" class="value">Soma</span>
+        </div>
+        <div class="stat">
+          <span class="label">Tempo</span>
+          <span id="timeLeft" class="value">03:00</span>
+        </div>
+        <div class="stat">
+          <span class="label">Velocidade</span>
+          <span id="pace" class="value">0</span>
+        </div>
+      </section>
+      <section class="arena-wrapper">
+        <div id="attemptsCounter" class="attempts-counter">Tentativas: 0</div>
 
-    <section class="arena-wrapper">
-      <canvas id="arena" width="960" height="560"></canvas>
-      <div class="overlay hidden" id="overlay">
-        <p class="title" id="overlayTitle">Base invadida</p>
-        <p class="subtitle" id="overlaySubtitle">Use Reiniciar para tentar novamente.</p>
-        <button id="playAgain">Jogar de novo</button>
-      </div>
-    </section>
+        <canvas id="arena" width="960" height="560"></canvas>
 
-    <section class="input-area">
-      <label for="answer">Digite o resultado e pressione Enter para atirar</label>
-      <div class="input-row">
-        <input id="answer" type="text" inputmode="numeric" autocomplete="off" placeholder="Ex.: 12">
-        <button id="shootBtn">Atirar</button>
-      </div>
-      <p class="hint">
-        O piloto fica parado defendendo a base. Os inimigos descem com contas acima da cabeça; resolva-as para eliminá-los.
-      </p>
-    </section>
-  </main>
+        <div class="overlay hidden" id="overlay">
+          <p class="title" id="overlayTitle">Base invadida</p>
+          <p class="subtitle" id="overlaySubtitle">
+            Use Reiniciar para tentar novamente.
+          </p>
+          <button id="playAgain">Jogar de novo</button>
+        </div>
+        <div class="boss-bar hidden" id="bossBar">
+          <div class="boss-bar-label">Chefao</div>
+          <div class="boss-bar-track">
+            <div class="boss-bar-fill" id="bossBarFill"></div>
+          </div>
+        </div>
+        <section class="terminal-panel">
+          <div class="terminal-inner">
+            <div class="terminal-line">
+              ONDA: <span id="wave">1</span> | VIDA:
+              <span id="healthStatus" class="ok">OK</span>
+            </div>
+            <div class="terminal-line">
+              ESCREVA: [
+              <input
+                id="answer"
+                type="text"
+                inputmode="numeric"
+                autocomplete="off"
+                placeholder="59"
+              />
+              ]
+            </div>
+          </div>
+          <button id="shootBtn" class="shoot-btn">Atirar</button>
+        </section>
+      </section>
+    </main>
 
-  <footer class="tips">
-    <div>
-      <strong>Nível 1</strong>: deixe em <em>Soma</em> para começar de leve. Depois experimente os outros cenários.
+    <!-- Confirm reset modal -->
+    <div id="confirmResetModal" class="confirm-modal hidden">
+      <div class="confirm-inner">
+        <h3>Tem certeza?</h3>
+        <p>
+          Isso irá deletar todo o progresso do jogo (recordes e histórico de
+          erros). Essa ação não pode ser desfeita.
+        </p>
+        <div class="confirm-actions">
+          <button id="cancelResetBtn" class="ghost-btn">Cancelar</button>
+          <button id="confirmResetBtn" class="cta">Deletar Tudo</button>
+        </div>
+      </div>
     </div>
-    <div>
-      <strong>Sons</strong>: há efeitos de tiro, acerto e dano na base. Se não ouvir, clique em Iniciar para ativar.
-    </div>
-  </footer>
 
-  <script type="module" src="main.js"></script>
-</body>
+    <script type="module" src="main.js"></script>
+  </body>
 </html>
