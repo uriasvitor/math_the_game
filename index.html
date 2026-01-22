@@ -80,6 +80,11 @@
           <h4>Vida infinita</h4>
           <p>Soma com algarismos escolhidos</p>
         </button>
+        <button class="mode-card" data-scenario="sandbox">
+          <span class="tag elite">Sandbox</span>
+          <h4>Sandbox</h4>
+          <p>Spawn manual: chefao, asteróide, vida</p>
+        </button>
       </div>
 
       <div id="trainConfigPanel" class="train-config hidden">
@@ -104,6 +109,51 @@
         <div style="margin-top: 8px; display: flex; gap: 8px">
           <button id="trainBackBtn" class="ghost-btn">Voltar</button>
           <button id="trainStartBtn" class="cta">Começar Treino</button>
+        </div>
+      </div>
+      <div
+        id="sandboxPanel"
+        class="train-config hidden"
+        style="margin-top: 12px"
+      >
+        <h4>Sandbox</h4>
+        <label for="sbEntity">Entidade:</label>
+        <select id="sbEntity">
+          <option value="asteroid">Asteroid</option>
+          <option value="boss">Boss</option>
+          <option value="heart">Vida</option>
+          <option value="minion">Minion</option>
+        </select>
+        <label for="sbCount" style="margin-left: 8px">Quantidade:</label>
+        <input
+          id="sbCount"
+          type="number"
+          min="1"
+          max="20"
+          value="1"
+          style="width: 64px"
+        />
+        <label for="sbDigits" style="margin-left: 8px">Algarismos:</label>
+        <input
+          id="sbDigits"
+          type="number"
+          min="1"
+          max="6"
+          value="1"
+          style="width: 64px"
+        />
+        <label for="sbOperation" style="margin-left: 8px">Operação:</label>
+        <select id="sbOperation">
+          <option value="add">Soma</option>
+          <option value="sub">Subtracao</option>
+          <option value="mul">Multiplicacao</option>
+          <option value="div">Divisao</option>
+          <option value="sqrt">Raiz Quadrada</option>
+        </select>
+        <div style="margin-top: 8px; display: flex; gap: 8px">
+          <button id="sbBackBtn" class="ghost-btn">Voltar</button>
+          <button id="sbSpawnBtn" class="cta">Spawn</button>
+          <button id="sbStartBtn" class="cta">Começar Sandbox</button>
         </div>
       </div>
       <button id="closeMode" class="ghost-btn">Voltar</button>

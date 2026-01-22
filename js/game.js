@@ -23,6 +23,9 @@ export class Game {
     this.answerInput = answerInput;
     this.problemGen = new ProblemGenerator();
 
+    // training elapsed time counter (unbounded) so training pace can grow
+    this._trainingElapsed = 0;
+
     this.state = this.createInitialState();
     this.hud.setPhaseLabel(this.getScenarioLabel());
   }
@@ -52,6 +55,7 @@ export class Game {
   }
 
   get elapsed() {
+    if (this.isTraining()) return this._trainingElapsed;
     return this.state.totalTime - this.state.timeLeft;
   }
 
@@ -149,6 +153,16 @@ export class Game {
       ),
     };
     this.state.bossMinionTimer = 2.5;
+    // play spawn sound and show visual cue
+    try {
+      this.audio.playSpawn();
+      if (this.renderer)
+        this.renderer.showImpactLabel(
+          "CHEFÃO",
+          this.state.boss.x,
+          this.state.boss.y,
+        );
+    } catch (e) {}
   }
 
   hitBoss() {
@@ -189,6 +203,7 @@ export class Game {
       boss: null,
       bossMinionTimer: 0,
     };
+    this._trainingElapsed = 0;
     this.state.nextSpawn = 1 / this.getPace();
     this.hud.hideOverlay();
     this.hud.setPhaseLabel(this.getScenarioLabel());
@@ -293,6 +308,92 @@ export class Game {
       kind: "asteroid",
     };
     this.state.enemies.push(enemy);
+  }
+
+  spawnCustom(type, options = {}) {
+    const digits = options.digits ?? 1;
+    const operation = options.operation ?? "add";
+    const elapsed = this.elapsed;
+    const problem = this.problemGen.next("train", elapsed, {
+      digits,
+      operation,
+    });
+    if (type === "boss") {
+      if (!this.state.bossActive) {
+        this.spawnBoss();
+      }
+      if (this.state.boss) {
+        this.state.boss.problem = problem;
+        this.audio.playSpawn();
+        this.renderer.showImpactLabel(
+          "CHEFÃO",
+          this.state.boss.x,
+          this.state.boss.y,
+        );
+      }
+      return;
+    }
+
+    if (type === "heart" || type === "vida") {
+      const enemy = {
+        id: this.state.enemyId++,
+        x: randInt(80, this.renderer.canvas.width - 80),
+        y: -40,
+        speed: options.speed ?? scenarios[this.state.scenario].speed,
+        drift: randInt(-18, 18),
+        label: problem.label,
+        answer: problem.answer,
+        wobble: Math.random() * Math.PI * 2,
+        kind: "heart",
+      };
+      this.state.enemies.push(enemy);
+      try {
+        this.renderer.createLabel(enemy.id);
+      } catch (e) {}
+      this.audio.playSpawn();
+      this.renderer.showImpactLabel("VIDA", enemy.x, enemy.y);
+      return;
+    }
+
+    if (type === "minion") {
+      const enemy = {
+        id: this.state.enemyId++,
+        x: randInt(80, this.renderer.canvas.width - 80),
+        y: -40,
+        speed: options.speed ?? scenarios[this.state.scenario].speed + 15,
+        drift: randInt(-26, 26),
+        label: problem.label,
+        answer: problem.answer,
+        wobble: Math.random() * Math.PI * 2,
+        kind: "minion",
+      };
+      this.state.enemies.push(enemy);
+      try {
+        this.renderer.createLabel(enemy.id);
+      } catch (e) {}
+      this.audio.playSpawn();
+      this.renderer.showImpactLabel("MINION", enemy.x, enemy.y);
+      return;
+    }
+
+    // default: asteroid
+    const enemy = {
+      id: this.state.enemyId++,
+      x: randInt(80, this.renderer.canvas.width - 80),
+      y: -40,
+      speed: options.speed ?? scenarios[this.state.scenario].speed,
+      drift: 0,
+      label: problem.label,
+      answer: problem.answer,
+      wobble: Math.random() * Math.PI * 2,
+      kind: "asteroid",
+    };
+    this.state.enemies.push(enemy);
+    try {
+      this.renderer.createLabel(enemy.id);
+    } catch (e) {}
+    this.audio.playSpawn();
+    this.renderer.showImpactLabel(String(enemy.label), enemy.x, enemy.y);
   }
 
   handleShot(rawValue) {
@@ -416,13 +517,16 @@ export class Game {
   }
 
   update(dt) {
-    this.state.timeLeft = Math.max(0, this.state.timeLeft - dt);
-    if (
-      !this.isTraining() &&
-      !this.state.bossSpawned &&
-      this.state.timeLeft === 0
-    ) {
-      this.spawnBoss();
+    // decrement time; in training allow time to continue decreasing but track elapsed separately
+    if (this.isTraining()) {
+      this._trainingElapsed += dt;
+      this.state.timeLeft -= dt;
+    } else {
+      this.state.timeLeft = Math.max(0, this.state.timeLeft - dt);
+      // when time runs out in non-training modes, spawn the boss instead of finishing
+      if (!this.state.bossSpawned && this.state.timeLeft <= 0) {
+        this.spawnBoss();
+      }
     }
 
     const pace = this.getPace();
@@ -535,6 +639,9 @@ export class Game {
         : 0;
     const scenarioLabel = this.getScenarioLabel();
     const baseLife = this.isTraining() ? "INF" : this.state.baseLife;
+    const timeDisplay = this.isTraining()
+      ? "INF"
+      : formatTime(this.state.timeLeft);
     this.hud.update(
       {
         baseLife,
@@ -549,7 +656,7 @@ export class Game {
       },
       paceValue,
       best,
-      formatTime(this.state.timeLeft),
+      timeDisplay,
     );
   }
 

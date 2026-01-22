@@ -24,6 +24,14 @@ const trainOperationSelect = document.getElementById("trainOperation");
 const trainStartBtn = document.getElementById("trainStartBtn");
 const trainConfigPanel = document.getElementById("trainConfigPanel");
 const trainBackBtn = document.getElementById("trainBackBtn");
+const sandboxPanel = document.getElementById("sandboxPanel");
+const sbEntity = document.getElementById("sbEntity");
+const sbCount = document.getElementById("sbCount");
+const sbDigits = document.getElementById("sbDigits");
+const sbOperation = document.getElementById("sbOperation");
+const sbSpawnBtn = document.getElementById("sbSpawnBtn");
+const sbBackBtn = document.getElementById("sbBackBtn");
+const sbStartBtn = document.getElementById("sbStartBtn");
 const closeMode = document.getElementById("closeMode");
 const resetAllBtn = document.getElementById("resetAllBtn");
 const bossBarEl = document.getElementById("bossBar");
@@ -126,8 +134,17 @@ modeCards.forEach((card) => {
       if (trainConfigPanel) trainConfigPanel.classList.remove("hidden");
       const grid = modeScreen.querySelector(".mode-grid");
       if (grid) grid.classList.add("hidden");
+      if (closeMode) closeMode.classList.add("hidden");
       modeScreen.classList.remove("hidden");
       trainDigitsInput?.focus();
+      return;
+    } else if (mode === "sandbox") {
+      if (sandboxPanel) sandboxPanel.classList.remove("hidden");
+      const grid = modeScreen.querySelector(".mode-grid");
+      if (grid) grid.classList.add("hidden");
+      if (closeMode) closeMode.classList.add("hidden");
+      modeScreen.classList.remove("hidden");
+      sbEntity?.focus();
       return;
     }
     pickScenario(mode);
@@ -143,7 +160,33 @@ if (trainBackBtn) {
     if (trainConfigPanel) trainConfigPanel.classList.add("hidden");
     const grid = modeScreen.querySelector(".mode-grid");
     if (grid) grid.classList.remove("hidden");
+    if (closeMode) closeMode.classList.remove("hidden");
   });
+}
+if (sbBackBtn) {
+  sbBackBtn.addEventListener("click", () => {
+    if (sandboxPanel) sandboxPanel.classList.add("hidden");
+    const grid = modeScreen.querySelector(".mode-grid");
+    if (grid) grid.classList.remove("hidden");
+    if (closeMode) closeMode.classList.remove("hidden");
+  });
+}
+
+if (sbSpawnBtn) {
+  sbSpawnBtn.addEventListener("click", () => {
+    const kind = sbEntity.value || "asteroid";
+    const count = Math.max(1, Number.parseInt(sbCount.value, 10) || 1);
+    const digits = Math.max(1, Number.parseInt(sbDigits.value, 10) || 1);
+    const operation = sbOperation.value || "add";
+    for (let i = 0; i < count; i++) {
+      game.spawnCustom(kind, { digits, operation });
+    }
+    audio.playSpawn();
+  });
+}
+
+if (sbStartBtn) {
+  sbStartBtn.addEventListener("click", () => pickScenario("sandbox"));
 }
 
 pauseBtn.addEventListener("click", () => game.pause());

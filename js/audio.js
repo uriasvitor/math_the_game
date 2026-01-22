@@ -81,4 +81,22 @@ export class AudioManager {
     o1.stop(now + 0.5);
     o2.stop(now + 0.5);
   }
+
+  playSpawn() {
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const o = this.ctx.createOscillator();
+    const g = this.ctx.createGain();
+    o.type = "sine";
+    o.frequency.value = 320;
+    g.gain.value = 0.0001;
+    o.connect(g).connect(this.ctx.destination);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.25, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    o.start(now);
+    o.frequency.setValueAtTime(320, now);
+    o.frequency.exponentialRampToValueAtTime(720, now + 0.18);
+    o.stop(now + 0.38);
+  }
 }
