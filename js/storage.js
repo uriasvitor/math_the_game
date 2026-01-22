@@ -61,11 +61,24 @@ export class StorageManager {
   }
 
   getTopFailures(limit = 12) {
-    const items = Object.keys(this.failures).map((k) => ({
-      label: k,
-      ...(this.failures[k] || {}),
-    }));
+    const THRESHOLD = 10;
+    const items = Object.keys(this.failures)
+      .map((k) => ({ label: k, ...(this.failures[k] || {}) }))
+      .filter((it) => (it.count || 0) >= THRESHOLD);
     items.sort((a, b) => (b.count || 0) - (a.count || 0));
     return items.slice(0, limit);
+  }
+
+  registerSuccess(label) {
+    if (!label) return;
+    const entry = this.failures[label];
+    if (!entry) return;
+    entry.count = Math.max(0, (entry.count || 0) - 1);
+    if (entry.count <= 0) {
+      delete this.failures[label];
+    } else {
+      this.failures[label] = entry;
+    }
+    this.save();
   }
 }

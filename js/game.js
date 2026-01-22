@@ -522,6 +522,13 @@ export class Game {
       this.audio.playHit();
     }
     this.updateHud();
+    // In Recuperação mode, a successful destruction should reduce the failure count
+    try {
+      if (this.state.scenario === "recuperacao") {
+        this.storage.registerSuccess &&
+          this.storage.registerSuccess(enemy.label);
+      }
+    } catch (e) {}
   }
 
   finish(reason) {
@@ -631,10 +638,15 @@ export class Game {
           );
         }
         if (enemy.kind !== "heart") {
-          // register missed problem for recovery tracking
+          // register missed problem for recovery tracking, but skip in train/sandbox
           try {
-            this.storage.registerFailure &&
-              this.storage.registerFailure(enemy.label, enemy.answer);
+            if (
+              this.state.scenario !== "train" &&
+              this.state.scenario !== "sandbox"
+            ) {
+              this.storage.registerFailure &&
+                this.storage.registerFailure(enemy.label, enemy.answer);
+            }
           } catch (e) {}
           this.damageBase();
         }
