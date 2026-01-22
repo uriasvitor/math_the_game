@@ -20,9 +20,7 @@ body {
   margin: 0;
   min-height: 100vh;
   font-family: "Space Grotesk", system-ui, -apple-system, sans-serif;
-  background: radial-gradient(120% 120% at 30% 20%, #123862, #050c1c 55%),
-    radial-gradient(120% 120% at 80% 0%, #07263f, transparent 50%),
-    linear-gradient(135deg, #041226, #081b31);
+  background: linear-gradient(135deg, rgb(0 0 0), rgb(0 6 0));
   color: var(--text);
   padding: 16px clamp(14px, 2vw, 28px) 20px;
 }
@@ -36,6 +34,7 @@ h1 {
 header.banner {
   display: flex;
   align-items: center;
+  margin: 12px auto 0;
   justify-content: space-between;
   gap: 14px;
   background: linear-gradient(135deg, rgba(78, 240, 200, 0.07), rgba(255, 159, 67, 0.08));
@@ -44,7 +43,6 @@ header.banner {
   padding: 12px 16px;
   box-shadow: var(--shadow);
   max-width: 1100px;
-  margin: 0 auto;
 }
 
 .brand {
@@ -157,7 +155,7 @@ main {
 }
 
 .stat {
-  background: rgba(8, 20, 36, 0.75);
+  background: linear-gradient(180deg, rgba(26, 39, 31, 0.96), rgba(12, 20, 15, 0.97)) !important;
   border: 1px solid rgba(78, 240, 200, 0.18);
   border-radius: 12px;
   padding: 8px 10px;
@@ -182,7 +180,7 @@ main {
 
 .arena-wrapper {
   position: relative;
-  background: linear-gradient(160deg, rgba(30, 76, 109, 0.22), rgba(4, 18, 38, 0.65));
+  background: linear-gradient(180deg, rgba(26, 39, 31, 0.96), rgba(12, 20, 15, 0.97)) !important;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
   padding: 10px;
@@ -496,6 +494,43 @@ canvas {
   z-index: 4;
 }
 
+/* Apply terminal-panel visual style to main UI panels */
+.start-card,
+.mode-card,
+.train-config,
+#modsPanel,
+.overlay,
+.start-screen .start-card,
+.mode-screen,
+header.banner,
+.controls,
+
+footer.tips {
+  margin: 10px 0;
+  background: linear-gradient(180deg, rgba(26, 39, 31, 0.96), rgba(12, 20, 15, 0.97)) !important;
+  border: 2px solid #1f3528 !important;
+  color: #d6e5d2 !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.45), inset 0 0 0 1px rgba(0, 0, 0, 0.45) !important;
+}
+
+.mode-card {
+  border-radius: 12px !important;
+  padding: 14px !important;
+}
+
+.train-config,
+#modsPanel {
+  background: linear-gradient(180deg, rgba(16, 28, 20, 0.95), rgba(12, 20, 15, 0.95)) !important;
+  border: 1px solid #24382a !important;
+  padding: 12px !important;
+  border-radius: 10px !important;
+}
+
+.overlay {
+  background: rgba(8, 12, 18, 0.92) !important;
+  border: 2px solid #1f3528 !important;
+}
+
 .terminal-inner {
   flex: 1;
   font-family: "Space Grotesk", system-ui, sans-serif;
@@ -566,6 +601,42 @@ canvas {
   border-radius: 6px;
   backdrop-filter: blur(4px);
   z-index: 2;
+}
+
+/* Confirm reset modal */
+.confirm-modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(3, 8, 12, 0.6);
+  z-index: 9999;
+}
+
+.confirm-inner {
+  background: linear-gradient(180deg, rgba(16, 28, 20, 0.98), rgba(8, 14, 12, 0.98));
+  border: 2px solid #1f3528;
+  color: #d6e5d2;
+  padding: 18px;
+  border-radius: 12px;
+  max-width: 520px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
+}
+
+.confirm-inner h3 {
+  margin: 0 0 8px 0;
+}
+
+.confirm-inner p {
+  margin: 0 0 12px 0;
+  color: var(--muted);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
 

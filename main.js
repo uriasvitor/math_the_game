@@ -35,6 +35,9 @@ const sbBackBtn = document.getElementById("sbBackBtn");
 const sbStartBtn = document.getElementById("sbStartBtn");
 const closeMode = document.getElementById("closeMode");
 const resetAllBtn = document.getElementById("resetAllBtn");
+const confirmResetModal = document.getElementById("confirmResetModal");
+const confirmResetBtn = document.getElementById("confirmResetBtn");
+const cancelResetBtn = document.getElementById("cancelResetBtn");
 const bossBarEl = document.getElementById("bossBar");
 const bossBarFill = document.getElementById("bossBarFill");
 
@@ -66,7 +69,17 @@ const hud = new Hud({
   bossBarEl,
   bossBarFill,
 });
-const game = new Game({ renderer, hud, audio, storage, answerInput });
+const game = new Game({
+  renderer,
+  hud,
+  audio,
+  storage,
+  answerInput,
+  onRunStart: () => {
+    sessionAttempts++;
+    updateAttemptsDisplay();
+  },
+});
 
 // attempt counter for current session
 const attemptsCounterEl = document.getElementById("attemptsCounter");
@@ -137,9 +150,6 @@ function pickScenario(mode) {
     game.setScenario(mode);
   }
   game.reset();
-  // increment attempts when a run is actually started
-  sessionAttempts++;
-  updateAttemptsDisplay();
   game.start();
   closeModeSelection();
   startScreen.classList.add("hidden");
@@ -296,11 +306,33 @@ playAgainBtn.addEventListener("click", () => {
   openModeSelection();
 });
 
-resetAllBtn.addEventListener("click", () => {
-  storage.clearAll();
-  game.reset();
-  openModeSelection();
-});
+if (resetAllBtn) {
+  resetAllBtn.addEventListener("click", () => {
+    if (confirmResetModal) confirmResetModal.classList.remove("hidden");
+  });
+}
+
+if (cancelResetBtn) {
+  cancelResetBtn.addEventListener("click", () => {
+    if (confirmResetModal) confirmResetModal.classList.add("hidden");
+  });
+}
+
+if (confirmResetBtn) {
+  confirmResetBtn.addEventListener("click", () => {
+    try {
+      storage.clearAll();
+      localStorage.removeItem("md_mods");
+    } catch (e) {}
+    sessionAttempts = 0;
+    updateAttemptsDisplay();
+    try {
+      if (confirmResetModal) confirmResetModal.classList.add("hidden");
+    } catch (e) {}
+    game.reset();
+    openModeSelection();
+  });
+}
 
 window.addEventListener(
   "pointerdown",

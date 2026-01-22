@@ -15,7 +15,7 @@ function lerp(a, b, t) {
 }
 
 export class Game {
-  constructor({ renderer, hud, audio, storage, answerInput }) {
+  constructor({ renderer, hud, audio, storage, answerInput, onRunStart }) {
     this.renderer = renderer;
     this.hud = hud;
     this.audio = audio;
@@ -23,6 +23,7 @@ export class Game {
     this.answerInput = answerInput;
     this.problemGen = new ProblemGenerator();
     this.mods = { autoReset: false, oneStrike: false };
+    this.onRunStart = typeof onRunStart === "function" ? onRunStart : null;
 
     // training elapsed time counter (unbounded) so training pace can grow
     this._trainingElapsed = 0;
@@ -223,6 +224,9 @@ export class Game {
     this.audio.ensure();
     this.state.running = true;
     this.answerInput.focus();
+    try {
+      if (this.onRunStart) this.onRunStart();
+    } catch (e) {}
   }
 
   pause() {

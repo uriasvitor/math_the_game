@@ -13,23 +13,6 @@
     <link rel="stylesheet" href="styles/style.css" />
   </head>
   <body>
-    <header class="banner">
-      <div class="brand">
-        <span class="badge">Novo</span>
-        <div>
-          <p class="eyebrow">Jogo de digitacao</p>
-          <h1>Math Defender</h1>
-        </div>
-      </div>
-      <div class="controls">
-        <button id="startBtn">Niveis</button>
-        <button id="modsBtn" class="ghost-btn small">Mods</button>
-        <button id="pauseBtn">Pausar</button>
-        <button id="resetBtn">Reiniciar</button>
-        <button id="resetAllBtn" class="ghost-btn small">Resetar tudo</button>
-      </div>
-    </header>
-
     <div class="start-screen" id="startScreen">
       <div class="start-card">
         <p class="eyebrow">Defesa espacial</p>
@@ -192,6 +175,22 @@
     </div>
 
     <main>
+      <header class="banner">
+        <div class="brand">
+          <span class="badge">Novo</span>
+          <div>
+            <p class="eyebrow">Jogo de digitacao</p>
+            <h1>Math Defender</h1>
+          </div>
+        </div>
+        <div class="controls">
+          <button id="startBtn">Niveis</button>
+          <button id="modsBtn" class="ghost-btn small">Mods</button>
+          <button id="pauseBtn">Pausar</button>
+          <button id="resetBtn">Reiniciar</button>
+          <button id="resetAllBtn" class="ghost-btn small">Resetar tudo</button>
+        </div>
+      </header>
       <section class="hud">
         <div class="stat">
           <span class="label">Base</span>
@@ -259,16 +258,20 @@
       </section>
     </main>
 
-    <footer class="tips">
-      <div>
-        <strong>Nível 1</strong>: deixe em <em>Soma</em> para começar de leve.
-        Depois experimente os outros cenários.
+    <!-- Confirm reset modal -->
+    <div id="confirmResetModal" class="confirm-modal hidden">
+      <div class="confirm-inner">
+        <h3>Tem certeza?</h3>
+        <p>
+          Isso irá deletar todo o progresso do jogo (recordes e histórico de
+          erros). Essa ação não pode ser desfeita.
+        </p>
+        <div class="confirm-actions">
+          <button id="cancelResetBtn" class="ghost-btn">Cancelar</button>
+          <button id="confirmResetBtn" class="cta">Deletar Tudo</button>
+        </div>
       </div>
-      <div>
-        <strong>Sons</strong>: há efeitos de tiro, acerto e dano na base. Se não
-        ouvir, clique em Iniciar para ativar.
-      </div>
-    </footer>
+    </div>
 
     <script type="module" src="main.js"></script>
   </body>
