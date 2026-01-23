@@ -60,7 +60,7 @@ python -m http.server 8000
 
 ## GitHub Pages
 
-Jogue online: [math-the-game (GitHub Pages)](https://seu-usuario.github.io/math-the-game/)
+Jogue online: [math-the-game (GitHub Pages)](https://uriasvitor.github.io/math_planet_defender/)
 
 ---
 
@@ -129,7 +129,7 @@ Math Defender is a browser-based typing + math-practice game built with JavaScri
 
 | Feature      |                                                      Status |
 | ------------ | ----------------------------------------------------------: |
-| GitHub Pages | ✅ [Live demo](https://uriasvitor.github.io/math_the_game/) |
+| GitHub Pages | ✅ [Live demo](**https://uriasvitor.github.io/math_the_game/**) |
 
 ---
 
