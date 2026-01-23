@@ -119,7 +119,7 @@ Math Defender is a browser-based typing/math game. Defend the base by typing ans
 
 # Math Defender 🚀🧮
 
-Live demo: https://uriasvitor.github.io/math_the_game/
+Live demo: https://uriasvitor.github.io/math_planet_defender/
 
 Math Defender is a browser-based typing + math-practice game built with JavaScript and THREE.js. Defend the base by typing answers to arithmetic problems before enemies reach the orbital barrier.
 
